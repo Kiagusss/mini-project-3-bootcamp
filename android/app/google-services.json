@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "107924757929",
+    "project_id": "super-bootcamp2",
+    "storage_bucket": "super-bootcamp2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:107924757929:android:69197d8afc0e339c46b8b8",
+        "android_client_info": {
+          "package_name": "com.superbootcamp.com"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTbeOrObjdW-uXir8ArFkuefQKmsxUnw0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
