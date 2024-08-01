@@ -8,7 +8,7 @@ import '../bloc/product_bloc/product_bloc.dart';
 import '../main.dart';
 import '../model/product_model.dart';
 import '../shared/style.dart';
-import 'product_detail_page.dart'; // Import halaman detail produk
+import 'product_detail_page.dart'; 
 import 'widgets/custom_drawer.dart';
 
 class ProductPage extends StatelessWidget {

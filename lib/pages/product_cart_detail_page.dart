@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/product_cart_cubit/product_detail_cubit.dart'; // Pastikan path ini benar
-import '../model/product_cart_model.dart'; // Pastikan path ini benar
-import '../services/repository/cart_repository.dart'; // Pastikan path ini benar
+import '../bloc/product_cart_cubit/product_detail_cubit.dart';
+import '../model/product_cart_model.dart';
+import '../services/repository/cart_repository.dart';
 import '../shared/style.dart';
 
 class ProductCartDetailPage extends StatelessWidget {
@@ -20,10 +20,9 @@ class ProductCartDetailPage extends StatelessWidget {
         ),
       ),
       body: BlocProvider(
-        create: (context) => ProductDetailCubit(
-            cartRepository: CartRepository() // Pastikan repository sudah sesuai
-            )
-          ..fetchProductDetail(productId),
+        create: (context) =>
+            ProductDetailCubit(cartRepository: CartRepository())
+              ..fetchProductDetail(productId),
         child: BlocBuilder<ProductDetailCubit, ProductDetailState>(
           builder: (context, state) {
             if (state is ProductDetailLoading) {
@@ -32,75 +31,54 @@ class ProductCartDetailPage extends StatelessWidget {
 
             if (state is ProductDetailLoaded) {
               final product = state.product;
-              return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView(
-                  children: [
-                    Center(
-                      child: Image.network(
-                        product.image!,
-                        height: 300,
-                        fit: BoxFit.fitWidth,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      product.title!,
-                      style: title.copyWith(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '\$${product.price}',
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        const Icon(Icons.star, color: Colors.amber),
-                        const SizedBox(width: 5),
-                        Text(
-                          product.rating!.rate.toString(),
-                          style: TextStyle(
-                            color: blackColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          '(${product.rating?.count} reviews)',
-                          style: subtitle.copyWith(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      product.description!,
-                      style: subtitle.copyWith(
-                        fontSize: 18,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              );
+              return ProductDetail(product: product);
             }
 
             if (state is ProductDetailError) {
-              return const Center(child: Text('Failed to load product detail'));
+              return const Center(
+                  child: Text('Failed to fetch product detail'));
             }
 
             return const SizedBox();
           },
         ),
+      ),
+    );
+  }
+}
+
+class ProductDetail extends StatelessWidget {
+  final ProductCartModel product;
+
+  const ProductDetail({super.key, required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: ListView(
+        children: [
+          Image.network(product.image!),
+          const SizedBox(height: 16),
+          Text(
+            product.title!,
+            style: title.copyWith(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '\$${product.price}',
+            style: title.copyWith(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: primaryColor,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            product.description!,
+            style: body,
+          ),
+        ],
       ),
     );
   }

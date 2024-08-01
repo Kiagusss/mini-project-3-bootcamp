@@ -1,15 +1,25 @@
-
-import 'package:dio/dio.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../model/product_model.dart';
 
 class ProductCartRepository {
-  final Dio dio;
+  final FirebaseFirestore firestore;
 
-  ProductCartRepository({required this.dio});
+  ProductCartRepository({required this.firestore});
 
   Future<ProductModel> getProductDetail(int productId) async {
-    final response = await dio.get('https://jsonplaceholder.typicode.com/products/$productId');
-    return ProductModel.fromJson(response.data);
+    try {
+      DocumentSnapshot doc = await firestore
+          .collection('products')
+          .doc(productId.toString())
+          .get();
+
+      if (doc.exists) {
+        return ProductModel.fromFirestore(doc);
+      } else {
+        throw Exception('Product not found');
+      }
+    } catch (e) {
+      throw Exception('Failed to load product: $e');
+    }
   }
 }

@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:mini_project_3_bootcamp/bloc/auth_bloc/auth_bloc.dart';
 import 'package:mini_project_3_bootcamp/bloc/product_cart_cubit/product_detail_cubit.dart';
+import 'package:mini_project_3_bootcamp/fcm_helper.dart';
 import 'package:mini_project_3_bootcamp/firebase_option.dart';
-import 'package:mini_project_3_bootcamp/pages/login_oage.dart';
+import 'package:mini_project_3_bootcamp/pages/login_page.dart';
 import 'package:mini_project_3_bootcamp/services/repository/cart_repository.dart';
 import 'package:mini_project_3_bootcamp/shared/style.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +22,7 @@ import 'services/repository/profile_repository.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
+  await FcmHelper().init();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.android,
@@ -27,6 +30,7 @@ void main() async {
   addDataToFirestore();
   addOrdersToFirestore();
   await NotificationHelper().initLocalNotifications();
+
   runApp(const MyApp());
 }
 
@@ -40,13 +44,17 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => ProfileBloc(ProfileRepository()),
         ),
-        Provider<CartRepository>(create: (_) => CartRepository()),
+        Provider<CartRepository>(
+          create: (_) => CartRepository(),
+        ),
         BlocProvider(
-          create: (context) => CartBloc()..add(LoadCartEvent()),
+          create: (context) =>
+              CartBloc(cartRepository: context.read<CartRepository>())
+                ..add(LoadCartEvent()),
         ),
         BlocProvider<ProductDetailCubit>(
           create: (context) => ProductDetailCubit(
-            cartRepository: CartRepository(),
+            cartRepository: context.read<CartRepository>(),
           ),
         ),
         BlocProvider(
@@ -54,6 +62,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => ProductBloc(ProductRepository()),
+        ),
+        BlocProvider(
+          create: (context) => AuthBloc(),
         ),
       ],
       child: const MaterialApp(

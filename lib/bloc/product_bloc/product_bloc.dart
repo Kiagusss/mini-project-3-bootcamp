@@ -18,7 +18,8 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       try {
         final products = await productRepository.fetchProduct();
         allProducts = products;
-        emit(ProductLoadedState(products: products, filteredProducts: products));
+        emit(
+            ProductLoadedState(products: products, filteredProducts: products));
       } catch (e) {
         emit(ProductErrorState());
       }
@@ -28,9 +29,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       final query = event.query.toLowerCase();
       final filteredProducts = allProducts.where((product) {
         return product.title.toLowerCase().contains(query) ||
-               product.description.toLowerCase().contains(query);
+            product.description.toLowerCase().contains(query);
       }).toList();
-      emit(ProductLoadedState(products: allProducts, filteredProducts: filteredProducts));
+      emit(ProductLoadedState(
+          products: allProducts, filteredProducts: filteredProducts));
     });
   }
 }

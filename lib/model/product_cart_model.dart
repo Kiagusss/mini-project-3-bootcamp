@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ProductCartModel {
   final int? id;
   final String? title;
@@ -27,6 +29,19 @@ class ProductCartModel {
         image: json["image"],
         rating: Rating.fromJson(json["rating"]),
       );
+
+  factory ProductCartModel.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return ProductCartModel(
+      id: data['id'],
+      title: data['title'],
+      price: data['price']?.toDouble(),
+      description: data['description'],
+      category: data['category'],
+      image: data['image'],
+      rating: data['rating'] != null ? Rating.fromJson(data['rating']) : null,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "id": id,

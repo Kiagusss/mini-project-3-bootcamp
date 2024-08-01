@@ -7,7 +7,7 @@ import '../bloc/cart_bloc/cart_bloc.dart';
 import '../model/cart_model.dart';
 import '../model/product_cart_model.dart';
 import '../shared/lottie.dart';
-import '../shared/style.dart'; 
+import '../shared/style.dart';
 
 class CartPage extends StatelessWidget {
   const CartPage({super.key});

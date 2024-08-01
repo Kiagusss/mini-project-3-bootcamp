@@ -1,59 +1,49 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ProductModel {
-  int id;
-  String title;
-  double price;
-  String description;
-  String category;
-  String image;
-  Rating rating;
+  final String id;
+  final String title;
+  final String description;
+  final double price;
+  final String image;
+  final RatingModel rating;
 
   ProductModel({
     required this.id,
     required this.title,
-    required this.price,
     required this.description,
-    required this.category,
+    required this.price,
     required this.image,
     required this.rating,
   });
 
-  factory ProductModel.fromJson(Map<String, dynamic> json) => ProductModel(
-        id: json["id"],
-        title: json["title"],
-        price: json["price"]?.toDouble(),
-        description: json["description"],
-        category: json["category"],
-        image: json["image"],
-        rating: Rating.fromJson(json["rating"]),
-      );
-
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "title": title,
-        "price": price,
-        "description": description,
-        "category": category,
-        "image": image,
-        "rating": rating.toJson(),
-      };
+  // Metode fromFirestore
+  factory ProductModel.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return ProductModel(
+      id: doc.id,
+      title: data['title'] ?? '',
+      description: data['description'] ?? '',
+      price: (data['price'] ?? 0).toDouble(),
+      image: data['image'] ?? '',
+      rating: RatingModel.fromMap(data['rating'] ?? {}),
+    );
+  }
 }
 
-class Rating {
-  double rate;
-  int count;
+class RatingModel {
+  final double rate;
+  final int count;
 
-  Rating({
+  RatingModel({
     required this.rate,
     required this.count,
   });
 
-  factory Rating.fromJson(Map<String, dynamic> json) => Rating(
-        rate: json["rate"]?.toDouble(),
-        count: json["count"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "rate": rate,
-        "count": count,
-      };
+  factory RatingModel.fromMap(Map<String, dynamic> data) {
+    return RatingModel(
+      rate: (data['rate'] ?? 0).toDouble(),
+      count: data['count'] ?? 0,
+    );
+  }
 }

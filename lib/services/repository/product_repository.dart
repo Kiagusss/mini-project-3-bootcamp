@@ -1,21 +1,19 @@
-import 'dart:convert';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../model/product_model.dart';
-import 'package:http/http.dart' as http;
 
 class ProductRepository {
-  final String apiUrl = "https://fakestoreapi.com/products";
+  final CollectionReference productCollection =
+      FirebaseFirestore.instance.collection('products');
 
   Future<List<ProductModel>> fetchProduct() async {
-    final response = await http.get(Uri.parse(apiUrl));
-
-    if (response.statusCode == 200) {
-      List<ProductModel> product = (json.decode(response.body) as List)
-          .map((data) => ProductModel.fromJson(data))
-          .toList();
-      print(product);
-      return product;
-    } else {
+    try {
+      final snapshot = await productCollection.get();
+      final products = snapshot.docs.map((doc) {
+        return ProductModel.fromFirestore(doc);
+      }).toList();
+      return products;
+    } catch (e) {
+      print('Failed to fetch products from Firestore: $e');
       throw Exception('Failed to load product');
     }
   }
