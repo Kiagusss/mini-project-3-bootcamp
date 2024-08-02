@@ -211,7 +211,7 @@ class _LoginPageState extends State<LoginPage> {
                       builder: (context, state) {
                         return AnimatedSwitcher(
                           duration: const Duration(milliseconds: 250),
-                          child: state.isLoading
+                          child: state is AuthLoading
                               ? const CircularProgressIndicator()
                               : ElevatedButton(
                                   onPressed: () {

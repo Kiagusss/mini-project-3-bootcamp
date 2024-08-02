@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mini_project_3_bootcamp/pages/login_page.dart';
 import 'package:mini_project_3_bootcamp/pages/product_page.dart';
 
-
 import '../bloc/auth_bloc/auth_bloc.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -16,8 +15,9 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
   bool _obscureText = true;
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,9 +32,9 @@ class _RegisterPageState extends State<RegisterPage> {
             );
             // Trigger login event
             context.read<AuthBloc>().add(AuthLogin(
-              email: emailController.text,
-              password: passController.text,
-            ));
+                  email: emailController.text,
+                  password: passController.text,
+                ));
           } else if (state is AuthFailure && state.isRegistering) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -160,6 +160,54 @@ class _RegisterPageState extends State<RegisterPage> {
                     height: 15,
                   ),
                   const Text(
+                    "Username",
+                    style: TextStyle(
+                      color: Color(0xff454545),
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  SizedBox(
+                    width: 350,
+                    child: TextFormField(
+                      controller: usernameController,
+                      decoration: InputDecoration(
+                        hintText: 'Enter your Username',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: const BorderSide(
+                            color: Colors.blue,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide:
+                              const BorderSide(color: Color(0xffF0F0F0)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: const BorderSide(
+                            color: Color(0xff2E6EEF),
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your username';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  const Text(
                     "Password",
                     style: TextStyle(
                       color: Color(0xff454545),
@@ -227,17 +275,21 @@ class _RegisterPageState extends State<RegisterPage> {
                       builder: (context, state) {
                         return AnimatedSwitcher(
                           duration: const Duration(milliseconds: 250),
-                          child: state.isLoading
+                          child: state is AuthLoading
                               ? const CircularProgressIndicator()
                               : ElevatedButton(
                                   onPressed: () {
                                     final email = emailController.text;
                                     final pass = passController.text;
-                                    if (email.isNotEmpty && pass.isNotEmpty) {
+                                    final username = usernameController.text;
+                                    if (email.isNotEmpty &&
+                                        pass.isNotEmpty &&
+                                        username.isNotEmpty) {
                                       context.read<AuthBloc>().add(
                                             AuthRegister(
-                                              email: emailController.text,
-                                              password: passController.text,
+                                              email: email,
+                                              password: pass,
+                                              username: username,
                                             ),
                                           );
                                     }
@@ -277,10 +329,8 @@ class _RegisterPageState extends State<RegisterPage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        InkWell(
+                        const SizedBox(width: 5),
+                        GestureDetector(
                           onTap: () {
                             Navigator.pushReplacement(
                               context,
@@ -296,9 +346,12 @@ class _RegisterPageState extends State<RegisterPage> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
+                        )
                       ],
                     ),
+                  ),
+                  const SizedBox(
+                    height: 10,
                   ),
                 ],
               ),

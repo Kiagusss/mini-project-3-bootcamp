@@ -1,50 +1,61 @@
-import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mini_project_3_bootcamp/services/repository/auth_repository.dart';
+import 'package:equatable/equatable.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc() : super(const AuthState()) {
-    monitorAuthState();
+  final AuthRepository authRepository;
 
-    on<AuthRegister>((event, emit) async {
-      emit(state.copyWith(isLoading: true, isRegistering: true));
-
-      try {
-        final res = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: event.email,
-          password: event.password,
-        );
-
-        emit(AuthSuccess(user: res.user, isRegistering: true));
-      } catch (e) {
-        emit(AuthFailure(errorMessage: e.toString(), isRegistering: true));
-      }
-    });
-
-    on<AuthLogin>((event, emit) async {
-      emit(state.copyWith(isLoading: true, isRegistering: false));
-
-      try {
-        final res = await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: event.email,
-          password: event.password,
-        );
-
-        emit(AuthSuccess(user: res.user, isRegistering: false));
-      } catch (e) {
-        emit(AuthFailure(errorMessage: e.toString(), isRegistering: false));
-      }
-    });
+  AuthBloc({required this.authRepository}) : super(AuthInitial()) {
+    on<AuthRegister>(_onRegister);
+    on<AuthLogin>(_onLogin);
+    on<AuthLogout>(_onLogout);
+    on<AuthCheckStatus>(_onCheckStatus);
   }
 
-  void monitorAuthState() {
-    FirebaseAuth.instance.authStateChanges().listen((user) {
-      if (user != null) {
-        add(AuthUpdated(userData: user));
-      }
-    });
+  Future<void> _onRegister(AuthRegister event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      User? user = await authRepository.register(
+        email: event.email,
+        password: event.password,
+        username: event.username,
+      );
+      emit(AuthSuccess(user: user, isRegistering: true));
+    } catch (e) {
+      emit(AuthFailure(isRegistering: true, errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> _onLogin(AuthLogin event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      User? user = await authRepository.login(event.email, event.password);
+      emit(AuthSuccess(user: user, isRegistering: false));
+    } catch (e) {
+      emit(AuthFailure(isRegistering: false, errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> _onLogout(AuthLogout event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      await authRepository.logout();
+      emit(AuthInitial());
+    } catch (e) {
+      emit(AuthFailure(isRegistering: false, errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> _onCheckStatus(AuthCheckStatus event, Emitter<AuthState> emit) async {
+    User? user = await authRepository.getCurrentUser();
+    if (user != null) {
+      emit(AuthSuccess(user: user, isRegistering: false));
+    } else {
+      emit(AuthInitial());
+    }
   }
 }

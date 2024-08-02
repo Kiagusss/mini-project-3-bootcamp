@@ -5,10 +5,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mini_project_3_bootcamp/bloc/auth_bloc/auth_bloc.dart';
+import 'package:mini_project_3_bootcamp/bloc/document_bloc/document_cubit.dart';
 import 'package:mini_project_3_bootcamp/bloc/product_cart_cubit/product_detail_cubit.dart';
 import 'package:mini_project_3_bootcamp/fcm_helper.dart';
 import 'package:mini_project_3_bootcamp/firebase_option.dart';
 import 'package:mini_project_3_bootcamp/pages/login_page.dart';
+import 'package:mini_project_3_bootcamp/services/repository/auth_repository.dart';
 import 'package:mini_project_3_bootcamp/services/repository/cart_repository.dart';
 import 'package:mini_project_3_bootcamp/shared/style.dart';
 import 'package:provider/provider.dart';
@@ -22,11 +24,11 @@ import 'services/repository/profile_repository.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
-  await FcmHelper().init();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.android,
   );
+  await FcmHelper().init();
   addDataToFirestore();
   addOrdersToFirestore();
   await NotificationHelper().initLocalNotifications();
@@ -39,6 +41,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authRepository = AuthRepository();
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -61,10 +64,13 @@ class MyApp extends StatelessWidget {
           create: (context) => ProductCartCubit(),
         ),
         BlocProvider(
+          create: (_) => DocumentCubit(),
+        ),
+        BlocProvider(
           create: (context) => ProductBloc(ProductRepository()),
         ),
         BlocProvider(
-          create: (context) => AuthBloc(),
+          create: (context) => AuthBloc(authRepository: authRepository),
         ),
       ],
       child: const MaterialApp(
