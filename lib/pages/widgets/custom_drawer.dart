@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mini_project_3_bootcamp/bloc/auth_bloc/auth_bloc.dart';
+import 'package:mini_project_3_bootcamp/pages/login_page.dart';
+import 'package:provider/provider.dart';
 
 import '../../shared/style.dart';
 import '../cart_page.dart';
@@ -47,6 +50,24 @@ class CustomDrawer extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => const CartPage(),
                 ),
+              );
+            },
+          ),
+          ListTile(
+            title: Text(
+              'Log Out',
+              style: body,
+            ),
+            leading: const Icon(Icons.logout),
+            onTap: () {
+              context.read<AuthBloc>().add(AuthLogout());
+
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LoginPage(),
+                ),
+                (route) => false,
               );
             },
           ),

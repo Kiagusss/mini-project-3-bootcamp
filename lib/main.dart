@@ -568,11 +568,11 @@ void addOrdersToFirestore() async {
   ];
 
   for (var order in ordersList) {
-    // Check if the document already exists
+  
     DocumentReference docRef = orders.doc(order['id'].toString());
     DocumentSnapshot doc = await docRef.get();
     if (!doc.exists) {
-      // Add the document if it does not exist
+  
       await docRef
           .set(order)
           .catchError((error) => print("Failed to add order: $error"));
